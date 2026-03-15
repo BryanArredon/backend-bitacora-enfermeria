@@ -4,45 +4,79 @@
 [![Flask](https://img.shields.io/badge/Flask-2.0+-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 
-[cite_start]Este repositorio contiene el microservicio de **Gestión Clínica** para el proyecto "Plan Estratégico - Bitácora de Enfermería"[cite: 9]. [cite_start]Desarrollado por alumnos de la **Ingeniería en Desarrollo y Gestión de Software** de la **UTNG**[cite: 6, 12].
+El backend actúa como el núcleo de procesamiento clínico para el proyecto **"Bitácora de Enfermería"** (UTNG). Su objetivo principal es digitalizar registros hospitalarios y procesar los listados de pacientes y diagnósticos, interactuando de la mano con el `auth-service`.
 
-## 📑 Tabla de Contenidos
-1. [Descripción](#-descripción)
-2. [Arquitectura](#-arquitectura)
-3. [Tecnologías](#-tecnologías)
-4. [Instalación](#-instalación)
-5. [Endpoints](#-endpoints-api)
-6. [Normativa](#-cumplimiento-normativo)
+## ⚙️ Tecnologías y Librerías
 
----
-
-## 📖 Descripción
-[cite_start]El backend actúa como el núcleo de procesamiento para la digitalización de registros de enfermería[cite: 27]. [cite_start]Su objetivo principal es eliminar la dependencia de formatos físicos, reduciendo errores humanos y garantizando la disponibilidad de la información en tiempo real[cite: 22, 25].
-
-### Características Principales
-* [cite_start]**Soporte Offline-First**: Sincronización asíncrona mediante marcas de tiempo de cliente para entornos hospitalarios sin conexión estable[cite: 32, 56].
-* **Estructura de Microservicios**: Separación lógica entre identidad (`auth_service`) y operación clínica (`nursing_service`).
-* [cite_start]**Seguridad de Grado Médico**: Implementación de Row Level Security (RLS) para proteger datos sensibles de pacientes[cite: 38].
+* **Python 3.x**
+* **Flask** (Framework REST)
+* **Flask-SQLAlchemy** (ORM de bases de datos)
+* **psycopg** (Driver seguro para PostgreSQL moderno)
+* **python-dotenv** (Gestión de secretos)
+* **Flask-CORS** (Protección y comunicación multi-origen)
 
 ---
 
-## 🏗️ Arquitectura
-El sistema utiliza un **API Gateway** que redirige las peticiones a los microservicios correspondientes, cada uno con su propio esquema de base de datos para garantizar el aislamiento y la escalabilidad.
+## 🔑 Variables de Entorno
 
+El proyecto usa variables de entorno para manejar la cadena de conexión de Supabase de manera segura. Crea un archivo `.env` en base a `.env.example`:
 
+```env
+# Ejemplo
+SQLALCHEMY_DATABASE_URI="postgresql://postgres:<TU_PASSWORD>@<TU_HOST_SUPABASE>:5432/postgres"
+```
 
 ---
 
-## 🛠️ Instalación y Configuración
+## 🛠️ Instalación y Ejecución Local
 
-# Crear entorno virtual
-python3 -m venv venv
+Para levantar este microservicio sin contaminar tus instalaciones globales de Python, sigue este flujo estricto de **entornos virtuales (venv)**:
 
-# Activar entorno virtual
-source venv/bin/activate
+1. **Crear el entorno virtual** (Solo la primera vez):
+   ```bash
+   python3 -m venv venv
+   ```
 
-# Actualizar pip
-pip install --upgrade pip
+2. **Activar el entorno virtual**:
+   - En Mac/Linux:
+     ```bash
+     source venv/bin/activate
+     ```
+   - En Windows (CMD o PowerShell):
+     ```bash
+     .\venv\Scripts\activate
+     ```
 
-# Instalar dependencias
-pip install flask flask-cors python-dotenv psycopg2-binary
+3. **Instalar dependencias** del proyecto:
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+4. **Ejecutar el Servidor**:
+   ```bash
+   flask run
+   # O alternativamente:
+   # python3 -m flask run
+   ```
+
+El servicio por defecto arranca en el puerto **5000** (`http://127.0.0.1:5000`).
+
+---
+
+## 🏗️ Estructura del Proyecto
+
+```text
+backend-bitacora-enfermeria/
+├── app/
+│   ├── __init__.py      # Fábrica de la app Flask
+│   ├── config/          # Carga de variables del .env
+│   ├── models/          # Modelos SQLAlchemy para Tablas Clínicas
+│   ├── routes/          # Blueprints (Controladores) de rutas API
+│   ├── services/        # Reglas y lógica de procesamiento
+│   └── utils/           # Herramientas de formateo o seguridad
+├── requirements.txt     # Listado estricto de dependencias
+├── app.py               # Punto de entrada de inicialización de DB
+└── database/
+    └── db.sql           # Esbozos en SQL crudo de las bases de Postgres
+```

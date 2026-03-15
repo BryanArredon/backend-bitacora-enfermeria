@@ -1,20 +1,11 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from app.config.config import Config
+from app import create_app
 
-app = Flask(__name__)
-CORS(app)
+db = SQLAlchemy()
 
-@app.route("/")
-def home():
-    return jsonify({"message": "API funcionando 🚀"})
+app = create_app()
 
-@app.route("/pacientes")
-def pacientes():
-    data = [
-        {"id":1,"nombre":"Juan"},
-        {"id":2,"nombre":"Maria"}
-    ]
-    return jsonify(data)
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)

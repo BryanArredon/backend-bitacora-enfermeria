@@ -1,0 +1,29 @@
+# Entornos Virtuales
+venv/
+env/
+.venv/
+
+# Variables de Entorno
+.env
+.env.local
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos del SO (macOS)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Entornos de desarrollo / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Flask / Aplicación local
+instance/
+*.sqlite3
+.pytest_cache/
