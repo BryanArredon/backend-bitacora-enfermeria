@@ -1,18 +1,34 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
 
+load_dotenv()  # Cargar .env antes de importar Config
+
+from .config.config import Config
+
+db = SQLAlchemy()
+
 def create_app():
-    load_dotenv()
     app = Flask(__name__)
+    app.config.from_object(Config)
+    db.init_app(app)
     CORS(app) 
 
     # Registro de rutas (Blueprints)
     from .routes.pacientes import pacientes_bp
     from .routes.bitacora import bitacora_bp
+    from .routes.perfiles import perfiles_bp
+    from .routes.auditoria import auditoria_bp
+    from .routes.reportes import reportes_bp
+    from .routes.cama import camas_bp
     
     app.register_blueprint(pacientes_bp, url_prefix='/api/pacientes')
     app.register_blueprint(bitacora_bp, url_prefix='/api/bitacora')
+    app.register_blueprint(perfiles_bp, url_prefix='/api/perfiles')
+    app.register_blueprint(auditoria_bp, url_prefix='/api/auditoria')
+    app.register_blueprint(reportes_bp, url_prefix='/api/reportes')
+    app.register_blueprint(camas_bp, url_prefix='/api/camas')
 
     return app
