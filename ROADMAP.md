@@ -1,24 +1,29 @@
 # 🐍 Hoja de Ruta Maestra: Backend Bitácora (Flask) al 100%
 
+### 🚨 FASE 0: Despliegue de Base de Datos (Nuevo - Urgente)
+El servidor falla al guardar porque las tablas físicas no existen en Postgres.
+- [x] **Crear Tablas en Supabase:** Ejecutar el flujo de creación de tablas (script `db.sql` o ejecutar `python3 app.py` una vez para que SQLAlchemy construya el esquema `enfermeria_ms`).
+
 ### 🛑 FASE 1: Reparación de Errores Críticos (Urgente)
 Antes de programar cosas nuevas, el servidor debe poder arrancar sin romperse y respetar las reglas de internet.
-- [ ] **Limpiar Código Basura:** Borrar el decorador huérfano `@bitacora_bp.route('<>')` en el archivo [app/routes/bitacora.py] (Línea 38).
-- [ ] **Corregir Verbo HTTP:** Cambiar `methods=['UPDATE']` por `methods=['PUT']` (o `PATCH`) en tu ruta de actualizar registros, ya que `UPDATE` no es un verbo web válido y será bloqueado.
-- [ ] **Importar Dependencias Internas faltantes:** Asegurarse de que [Bitacora] y `db` estén correctamente importados al inicio de [bitacora.py] (ej. `from app.models import Bitacora`, `from app import db`), porque actualmente marcan error de no encontrados.
+- [x] **Limpiar Código Basura:** Borrar el decorador huérfano `@bitacora_bp.route('<>')` en el archivo [app/routes/bitacora.py].
+- [x] **Corregir Verbo HTTP:** Cambiar `methods=['UPDATE']` por `methods=['PUT']` en tus rutas de actualización.
+- [x] **Importar Dependencias Internas faltantes:** Asegurarse de que los Modelos y `db` estén correctamente importados al inicio.
 
 ### 🔐 FASE 2: Integración de JWT (La conexión con MS-Seguridad)
 Obligar a que Flask valide a los usuarios que inician sesión en Java.
-- [ ] **Librería JWT:** Escribir `PyJWT==2.8.0` en el [requirements.txt] e instalarlo (`pip install -r requirements.txt`).
-- [ ] **Compartir Clave Maestra:** Declarar `JWT_SECRET` en el archivo [.env] del proyecto con el valor exacto que usas en tu MS de Java.
-- [ ] **Crear Guardián Automático:** Crear el archivo [app/utils/security.py] y programar ahí la función `@token_required` que lea el Header `Authorization: Bearer <token>`, lo verifique matemáticamente y rechace (Error 401) si está expirado o fue alterado.
-- [ ] **Proteger todas las Rutas:** El equipo debe colocar el `@token_required` debajo de cada petición que manipule datos sensibles de pacientes en sus controladores.
+- [x] **Librería JWT:** Escribir `PyJWT` en el [requirements.txt] e instalarlo.
+- [x] **Compartir Clave Maestra:** Uso de `JWT_SECRET` compartido (implementado en `app/utils/auth.py`).
+- [x] **Crear Guardián Automático:** Crear la función `@auth_required` que lee el Header `Authorization: Bearer <token>` y lo verifica.
+- [x] **Proteger todas las Rutas:** `@auth_required` fue colocado exitosamente debajo de cada petición en los controladores.
 
 ### 🧹 FASE 3: Validación de Datos (Evitar inyecciones o basura)
 Actualmente el backend confía ciegamente en cualquier dato que mande el frontend.
-- [ ] **Sanitizar el JSON:** Implementar lógica al inicio de las peticiones POST/PUT para verificar que no manden campos vacíos o tipos de datos incorrectos (ej. que la temperatura no venga como la palabra "hola"). Puedes apoyarte de librerías como Marshmallow.
-- [ ] **Capturar Errores de Base de Datos:** Los bloques `try-except` están bien, pero deben ser más sofisticados para avisarle al frontend exactamente qué falló (ej. "Paciente no encontrado" vs "Cama ya ocupada").
+- [ ] **Sanitizar el JSON:** Implementar lógica al inicio de las peticiones POST/PUT para verificar que no manden campos vacíos o tipos de datos incorrectos. Apoyarse de `Marshmallow`.
+- [ ] **Capturar Errores de Base de Datos:** Los bloques `try-except` deben ser más sofisticados para avisarle al frontend exactamente qué falló (ej. "Paciente no encontrado" vs "Cama ya ocupada").
 
 ### 🚀 FASE 4: Rendimiento y Arquitectura Avanzada (Opcional pero Recomendado)
 Evita que el sistema colapse cuando tengan millones de registros médicos.
-- [ ] **Paginación:** Modificar el endpoint GET `/` (que actualmente trae la lista completa con `.all()`). Si el hospital lleva 30,000 registros, el servidor se quedará sin memoria. Deben devolver los registros en páginas (ej. de 50 en 50).
-- [ ] **Auditoría (Quién hizo qué):** Modificar el `@token_required` para que extraiga el correo del enfermero que viene oculto dentro del JWT y guardarlo en la Base de Datos como autor del nuevo registro de signos vitales.
+- [ ] **Paginación:** Modificar el endpoint GET `/` (cambiar `.all()` por paginación). Si el hospital lleva 30,000 registros, el servidor se quedará sin memoria.
+- [ ] **Auditoría (Quién hizo qué):** Automatizar el registro de auditoría utilizando _Signals_ de SQLAlchemy y extrayendo al autor del token JWT oculto.
+- [ ] **Capa de Servicios:** Mover las reglas de negocio y cálculos a archivos en `app/services/` para limpiar los crudos controladores de rutas.
