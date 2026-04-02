@@ -19,11 +19,11 @@ Obligar a que Flask valide a los usuarios que inician sesión en Java.
 
 ### 🧹 FASE 3: Validación de Datos (Evitar inyecciones o basura)
 Actualmente el backend confía ciegamente en cualquier dato que mande el frontend.
-- [ ] **Sanitizar el JSON:** Implementar lógica al inicio de las peticiones POST/PUT para verificar que no manden campos vacíos o tipos de datos incorrectos. Apoyarse de `Marshmallow`.
-- [ ] **Capturar Errores de Base de Datos:** Los bloques `try-except` deben ser más sofisticados para avisarle al frontend exactamente qué falló (ej. "Paciente no encontrado" vs "Cama ya ocupada").
+- [X] **Sanitizar el JSON:** Implementar lógica al inicio de las peticiones POST/PUT para verificar que no manden campos vacíos o tipos de datos incorrectos. Apoyarse de `Marshmallow`.
+- [X] **Capturar Errores de Base de Datos:** Los bloques `try-except` deben ser más sofisticados para avisarle al frontend exactamente qué falló (ej. "Paciente no encontrado" vs "Cama ya ocupada").
 
 ### 🚀 FASE 4: Rendimiento y Arquitectura Avanzada (Opcional pero Recomendado)
 Evita que el sistema colapse cuando tengan millones de registros médicos.
-- [ ] **Paginación:** Modificar el endpoint GET `/` (cambiar `.all()` por paginación). Si el hospital lleva 30,000 registros, el servidor se quedará sin memoria.
-- [ ] **Auditoría (Quién hizo qué):** Automatizar el registro de auditoría utilizando _Signals_ de SQLAlchemy y extrayendo al autor del token JWT oculto.
-- [ ] **Capa de Servicios:** Mover las reglas de negocio y cálculos a archivos en `app/services/` para limpiar los crudos controladores de rutas.
+- [X] **Paginación:** Modificar el endpoint GET `/` (cambiar `.all()` por paginación). Si el hospital lleva 30,000 registros, el servidor se quedará sin memoria.
+- [X] **Auditoría (Quién hizo qué):** Automatizar el registro de auditoría utilizando _Signals_ de SQLAlchemy y extrayendo al autor del token JWT oculto.
+- [X] **Capa de Servicios:** Mover las reglas de negocio y cálculos a archivos en `app/services/` para limpiar los crudos controladores de rutas.

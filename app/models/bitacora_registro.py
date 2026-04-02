@@ -2,9 +2,13 @@ from app import db
 import uuid
 from datetime import datetime
 
+
 class BitacoraRegistro(db.Model):
     __tablename__ = "bitacora_registros"
-    __table_args__ = {"schema": "enfermeria_ms"}
+    __table_args__ = (
+        db.UniqueConstraint('paciente_id', 'cliente_timestamp', name='unique_registro'),
+        {"schema": "enfermeria_ms"}
+    )
 
     id = db.Column(db.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     paciente_id = db.Column(db.UUID(as_uuid=True), db.ForeignKey('enfermeria_ms.pacientes.id'), nullable=False)
@@ -17,6 +21,9 @@ class BitacoraRegistro(db.Model):
     es_sincronizado = db.Column(db.Boolean, default=False)
     fecha_servidor = db.Column(db.DateTime, default=datetime.utcnow)
     fecha_actualizacion = db.Column(db.DateTime, default=datetime.utcnow)
+
+    #Auditoría
+    created_by = db.Column(db.UUID(as_uuid=True))
 
     paciente = db.relationship('Paciente', backref='bitacora_registros')
     enfermero = db.relationship('PerfilEnfermeria', backref='bitacora_registros')
