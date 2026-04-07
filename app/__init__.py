@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
@@ -31,4 +31,17 @@ def create_app():
     app.register_blueprint(reportes_bp, url_prefix='/api/reportes')
     app.register_blueprint(camas_bp, url_prefix='/api/camas')
 
+    # Endpoint de health check (sin autenticación requerida)
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        return jsonify({
+            "status": "healthy",
+            "service": "backend-bitacora-enfermeria",
+            "version": "1.0.0",
+            "timestamp": "2024-01-01T00:00:00Z"
+        }), 200
+
     return app
+
+# Crear la aplicación cuando se importa el módulo
+app = create_app()

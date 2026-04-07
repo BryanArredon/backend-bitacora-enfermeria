@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 import os
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
@@ -130,7 +130,7 @@ def test_login():
         return jsonify({"error": "Correo (o email) y password requeridos"}), 400
 
     try:
-        response = requests.post(f"{AUTH_SERVICE_URL}/api/auth/login", json={
+        response = requests.post(f"{current_app.config['AUTH_SERVICE_URL']}/api/auth/login", json={
             "correo": correo,
             "password": password
         })
