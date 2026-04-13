@@ -38,40 +38,44 @@ def verify_token_with_auth_service(token):
         )
         
         if response.status_code == 200:
+            print("Remote verification successful!")
             return response.json()
-        else:
-            logger.warning(f"Auth service returned status {response.status_code}")
-            return None
+            
+        print(f"Auth service returned status {response.status_code}, falling back to local...")
             
     except requests.RequestException as e:
-        logger.warning(f"Could not reach auth service: {str(e)}")
-        # Fallback: verificar localmente con JWT
-        try:
-            payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
-            return payload
-        except jwt.InvalidTokenError:
-            return None
+        print(f"Could not reach auth service: {str(e)}")
+        
+    # Fallback: verificar localmente con JWT si la petición falla o retorna != 200 (como 403, 404)
+    try:
+        print(f"Decoding token: {token[:10]}...")
+        payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+        print(f"Payload decoded successfully: {payload}")
+        return payload
+    except Exception as e:
+        print(f"JWT Decode completely failed with Exception: {type(e).__name__} -> {str(e)}")
+        return None
 
 def auth_required(fn):
     """
     Decorador que verifica la autenticación del usuario
-    
-    Puede usar:
-    1. Auth service remoto (producción)
-    2. JWT local (fallback / desarrollo)
     """
     @wraps(fn)
     def wrapper(*args, **kwargs):
         auth_header = request.headers.get('Authorization', '')
         if not auth_header.startswith('Bearer '):
+            print("No auth header provided or invalid format")
             return jsonify({"error": "Token requerido"}), 401
         
         token = auth_header.split(' ', 1)[1]
+        print(f"Auth header received. Token len: {len(token)}")
         
         # Intentar verificar con auth service
         payload = verify_token_with_auth_service(token)
+        print(f"Payload resolved from verification: {payload}")
         
         if not payload:
+            print("Empty or None payload! Returning 401")
             return jsonify({"error": "Token inválido o expirado"}), 401
         
         # Guardar la información del usuario en el request

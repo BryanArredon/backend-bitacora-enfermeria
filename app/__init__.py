@@ -14,7 +14,10 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
-    CORS(app) 
+    
+    # Configuración de CORS basada en variable de entorno
+    cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:3000').split(',')
+    CORS(app, resources={r"/api/*": {"origins": cors_origins}}, supports_credentials=True)
 
     # Registro de rutas (Blueprints)
     from .routes.pacientes import pacientes_bp

@@ -39,6 +39,8 @@ def get_registros():
     data = [{
         'id': str(r.id),
         'paciente_id': str(r.paciente_id),
+        'paciente_nombre': r.paciente.nombre_completo if r.paciente else "Desconocido",
+        'cama': r.paciente.numero_cama if r.paciente else "N/A",
         'enfermero_id': str(r.enfermero_id),
         'turno': r.turno,
         'signos_vitales': r.signos_vitales,
@@ -100,8 +102,7 @@ def add_registro():
             signos_vitales=validated_data.get('signos_vitales', {}),
             observaciones=limpiar_texto(validated_data['observaciones']),
             medicamentos_administrados=validated_data.get('medicamentos_administrados', []),
-            cliente_timestamp=datetime.fromisoformat(validated_data['cliente_timestamp']),
-            created_by=request.user.get("id")  # 🔐 auditoría
+            cliente_timestamp=datetime.fromisoformat(validated_data['cliente_timestamp'])
         )
 
         db.session.add(nuevo_registro)
@@ -137,4 +138,33 @@ def test_login():
         return jsonify(response.json()), response.status_code
 
     except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@bitacora_bp.route('/<uuid:id>', methods=['PUT'])
+@auth_required
+def update_registro(id):
+    registro = BitacoraRegistro.query.get_or_404(id)
+    data = request.get_json()
+    
+    registro.observaciones = data.get('observaciones', registro.observaciones)
+    registro.signos_vitales = data.get('signos_vitales', registro.signos_vitales)
+    registro.medicamentos_administrados = data.get('medicamentos_administrados', registro.medicamentos_administrados)
+    
+    try:
+        db.session.commit()
+        return jsonify({"mensaje": "Registro actualizado correctamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+@bitacora_bp.route('/<uuid:id>', methods=['DELETE'])
+@auth_required
+def delete_registro(id):
+    registro = BitacoraRegistro.query.get_or_404(id)
+    try:
+        db.session.delete(registro)
+        db.session.commit()
+        return jsonify({"mensaje": "Registro eliminado correctamente"}), 200
+    except Exception as e:
+        db.session.rollback()
         return jsonify({"error": str(e)}), 500

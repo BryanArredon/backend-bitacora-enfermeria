@@ -22,8 +22,5 @@ class BitacoraRegistro(db.Model):
     fecha_servidor = db.Column(db.DateTime, default=datetime.utcnow)
     fecha_actualizacion = db.Column(db.DateTime, default=datetime.utcnow)
 
-    #Auditoría
-    created_by = db.Column(db.UUID(as_uuid=True))
-
     paciente = db.relationship('Paciente', backref='bitacora_registros')
     enfermero = db.relationship('PerfilEnfermeria', backref='bitacora_registros')
